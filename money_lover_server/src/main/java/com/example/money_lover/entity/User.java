@@ -1,39 +1,61 @@
-package com.example.money_lover.entity; // <--- QUAN TRỌNG NHẤT LÀ DÒNG NÀY
+package com.example.money_lover.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User { // <--- Tên class phải là User (số ít)
-
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class User {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    String id;
 
     @Column(name = "email", unique = true, nullable = false)
-    private String email;
+    String email;
 
-    @Column(name = "password", nullable = false)
-    private String password;
+    String password;
 
     @Column(name = "full_name")
-    private String fullName;
+    String fullName;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    // Map với cột created_at trong DB
+    @Column(name = "created_at")
+    LocalDateTime createdAt;
 
-    @UpdateTimestamp
+    // Map với cột updated_at trong DB
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    LocalDateTime updatedAt;
+
+    // --- CẤU HÌNH MANY-TO-MANY ---
+    @ManyToMany(fetch = FetchType.EAGER) 
+    // fetch = EAGER: Lấy User -> lấy luôn Role (Rất quan trọng cho Security)
+    @JoinTable(
+            name = "user_roles",                           // Tên bảng trung gian
+            joinColumns = @JoinColumn(name = "user_id"),   // Khóa liên kết với bảng User này
+            inverseJoinColumns = @JoinColumn(name = "role_name") // Khóa liên kết với bảng Role kia
+    )
+    Set<Role> roles;
+
+    // --- TỰ ĐỘNG CẬP NHẬT THỜI GIAN ---
+    
+    @PrePersist // Chạy trước khi lưu vào DB (Insert)
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate // Chạy trước khi cập nhật DB (Update)
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

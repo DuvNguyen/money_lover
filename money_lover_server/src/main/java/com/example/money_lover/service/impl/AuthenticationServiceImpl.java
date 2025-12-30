@@ -15,6 +15,8 @@ import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.StringJoiner; // Serve roles
+import org.springframework.util.CollectionUtils; // Serve roles
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -59,29 +61,32 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
     private String generateToken(User user) {
-        // Tạo Header (Dùng thuật toán HS512)
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
-        // Tạo Body (Claims - Dữ liệu muốn lưu trong token)
-        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getId()) // Token này đại diện cho ai? (Lưu ID)
-                .issuer("money_lover.com") // Ai cấp token này?
-                .issueTime(new Date()) // Thời điểm cấp
+        JWTClaimsSet.Builder jwtClaimsSetBuilder = new JWTClaimsSet.Builder()
+                .subject(user.getId())
+                .issuer("money_lover.com")
+                .issueTime(new Date())
                 .expirationTime(new Date(
-                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli() // Thời điểm hết hạn
-                ))
-                .claim("email", user.getEmail()) // Lưu thêm email (Custom Claim)
-                .build();
+                        Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
+                .claim("email", user.getEmail()); 
+        // Logic: Lấy list roles -> Nối thành chuỗi cách nhau bởi dấu cách (VD: "ADMIN, USER")
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+            StringJoiner stringJoiner = new StringJoiner(" ");
+            user.getRoles().forEach(role -> stringJoiner.add(role.getName()));
 
-        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+            // Lưu vào claim tên là "scope" (Chuẩn mặc định của Oauth2/Spring Security)
+            jwtClaimsSetBuilder.claim("scope", stringJoiner.toString());
+        }
+        // -----------------------------
+
+        Payload payload = new Payload(jwtClaimsSetBuilder.build().toJSONObject()); // Nhớ dùng .build()
         JWSObject jwsObject = new JWSObject(header, payload);
 
         try {
-            // Ký tên vào Token bằng Key bí mật
             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
-            // Lỗi kỹ thuật khi ký token (ít khi xảy ra)
             throw new RuntimeException(e);
         }
     }

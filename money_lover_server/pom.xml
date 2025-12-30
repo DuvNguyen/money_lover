@@ -19,6 +19,34 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version> 
     </properties>
 
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <flyway.cleanDisabled>false</flyway.cleanDisabled>
+                
+                <db.url>jdbc:postgresql://localhost:5432/money_lover</db.url>
+                <db.user>postgres</db.user>
+                
+                <db.password>example_123</db.password> 
+            </properties>
+        </profile>
+
+        <profile>
+            <id>prod</id>
+            <properties>
+                <flyway.cleanDisabled>true</flyway.cleanDisabled>
+                
+                <db.url>${env.DB_URL}</db.url>
+                <db.user>${env.DB_USER}</db.user>
+                <db.password>${env.DB_PASSWORD}</db.password>
+            </properties>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -74,6 +102,7 @@
             <version>0.11.5</version>
             <scope>runtime</scope>
         </dependency>
+        
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
@@ -97,7 +126,8 @@
     </dependencies>
 
     <build>
-        <plugins> <plugin>
+        <plugins> 
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
@@ -136,6 +166,17 @@
                             <version>1.5.5.Final</version>
                         </path>
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <configuration>
+                    <url>${db.url}</url>
+                    <user>${db.user}</user> 
+                    <password>${db.password}</password> 
+                    <cleanDisabled>${flyway.cleanDisabled}</cleanDisabled>
                 </configuration>
             </plugin>
         </plugins>

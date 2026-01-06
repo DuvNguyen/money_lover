@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor // Tự động tạo Constructor cho các biến final (Thay cho @Autowired)
+@RequiredArgsConstructor // Tự động tạo Constructor cho các biến final
 public class UserServiceImpl implements IUserService {
 
     private final UserRepository userRepository;

@@ -4,6 +4,7 @@ import com.example.money_lover.dto.request.AuthenticationRequest;
 import com.example.money_lover.dto.request.IntrospectRequest;
 import com.example.money_lover.dto.request.LogoutRequest;
 import com.example.money_lover.dto.request.RefreshRequest;
+import com.example.money_lover.dto.response.ApiResponse;
 import com.example.money_lover.dto.response.AuthenticationResponse;
 import com.example.money_lover.dto.response.IntrospectResponse;
 import com.example.money_lover.entity.InvalidatedToken;
@@ -12,6 +13,7 @@ import com.example.money_lover.exception.AppException;
 import com.example.money_lover.exception.ErrorCode;
 import com.example.money_lover.repository.InvalidatedTokenRepository;
 import com.example.money_lover.repository.UserRepository;
+import com.example.money_lover.service.EmailService;
 import com.example.money_lover.service.IAuthenticationService;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -26,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.text.ParseException;
 import java.time.Instant;
@@ -42,6 +45,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final InvalidatedTokenRepository invalidatedTokenRepository;
+    private final EmailService emailService;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -219,5 +223,20 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         return signedJWT;
+    }
+
+    // API Test gửi mail
+    @PostMapping("/email/test")
+    public ApiResponse<String> sendTestEmail() {
+        // Nội dung HTML test thử
+        String htmlContent = "<h1>Chào mừng đến với Money Lover!</h1>" +
+                             "<p>Đây là email test định dạng <b>HTML</b>.</p>";
+                             
+        // Thay email bên dưới bằng email phụ của bạn để kiểm tra
+        emailService.sendEmail("email_nhan_test_cua_ban@gmail.com", "Test Email Money Lover", htmlContent);
+        
+        return ApiResponse.<String>builder()
+                .result("Email sent successfully!")
+                .build();
     }
 }

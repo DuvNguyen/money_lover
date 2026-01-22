@@ -7,8 +7,11 @@ import com.example.money_lover.dto.request.RefreshRequest;
 import com.example.money_lover.dto.response.ApiResponse;
 import com.example.money_lover.dto.response.AuthenticationResponse;
 import com.example.money_lover.dto.response.IntrospectResponse;
+import com.example.money_lover.service.EmailService;
 import com.example.money_lover.service.IAuthenticationService;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,8 +59,6 @@ public class AuthenticationController {
         return ApiResponse.<Void>builder()
                 .build();
     }
-
-
-
+    
     
 }

@@ -225,18 +225,5 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         return signedJWT;
     }
 
-    // API Test gửi mail
-    @PostMapping("/email/test")
-    public ApiResponse<String> sendTestEmail() {
-        // Nội dung HTML test thử
-        String htmlContent = "<h1>Chào mừng đến với Money Lover!</h1>" +
-                             "<p>Đây là email test định dạng <b>HTML</b>.</p>";
-                             
-        // Thay email bên dưới bằng email phụ của bạn để kiểm tra
-        emailService.sendEmail("email_nhan_test_cua_ban@gmail.com", "Test Email Money Lover", htmlContent);
-        
-        return ApiResponse.<String>builder()
-                .result("Email sent successfully!")
-                .build();
-    }
+
 }

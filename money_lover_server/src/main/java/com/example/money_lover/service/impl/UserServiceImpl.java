@@ -2,12 +2,12 @@ package com.example.money_lover.service.impl;
 
 import com.example.money_lover.dto.request.UserCreationRequest;
 import com.example.money_lover.dto.response.UserResponse;
-import com.example.money_lover.entity.Role; // Import đúng Entity Role
+import com.example.money_lover.entity.Role; 
 import com.example.money_lover.entity.User;
 import com.example.money_lover.exception.AppException;
 import com.example.money_lover.exception.ErrorCode;
 import com.example.money_lover.mapper.UserMapper;
-import com.example.money_lover.repository.RoleRepository; // Import Repo mới
+import com.example.money_lover.repository.RoleRepository; 
 import com.example.money_lover.repository.UserRepository;
 import com.example.money_lover.service.EmailService;
 import com.example.money_lover.service.IUserService;
@@ -15,9 +15,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -66,10 +69,17 @@ public class UserServiceImpl implements IUserService {
 
         // Gửi mail
         try {
+            // Chuẩn bị dữ liệu để đẩy vào template
+            Map<String, Object> emailVariables = new HashMap<>();
+            emailVariables.put("name", user.getFullName());
+            emailVariables.put("email", user.getEmail());
+
+            // Gọi hàm gửi mail: Chỉ định tên file template là "welcome-email"
             emailService.sendEmail(
                 request.getEmail(),
-                "Chào mừng đến với Money Lover!",
-                "<h1>Xin chào " + user.getFullName() + "</h1><p>Bạn đã đăng ký thành công!</p>"
+                "Chào mừng thành viên mới!",
+                "welcome-email", // Tên file trong thư mục templates (không cần đuôi .html)
+                emailVariables
             );
         } catch (Exception e) {
             log.error("Lỗi gửi mail: {}", e.getMessage());

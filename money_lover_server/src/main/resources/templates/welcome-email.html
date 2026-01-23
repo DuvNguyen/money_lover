@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to Money Lover</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .header { color: #2ecc71; font-size: 24px; font-weight: bold; margin-bottom: 20px; }
+        .content { color: #555; line-height: 1.6; }
+        .footer { margin-top: 30px; font-size: 12px; color: #999; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Xin chào, <span th:text="${name}">User Name</span>!</div>
+        
+        <div class="content">
+            <p>Cảm ơn bạn đã đăng ký tài khoản tại <strong>Money Lover Clone</strong>.</p>
+            <p>Tài khoản của bạn là: <b th:text="${email}">abc@gmail.com</b></p>
+            <p>Hãy bắt đầu hành trình quản lý tài chính của bạn ngay hôm nay.</p>
+        </div>
+
+        <div class="footer">
+            &copy; 2026 Money Lover Clone. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>
